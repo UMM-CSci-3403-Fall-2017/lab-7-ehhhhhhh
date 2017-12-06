@@ -8,6 +8,7 @@ import java.net.Socket;
 public class EchoClient {
 	public static final int PORT_NUMBER = 6013;
 
+	//thread for processing system input
 	private static class inputThread {
 
 		Socket socket;
@@ -18,14 +19,17 @@ public class EchoClient {
 
 		public void run() {
 			try {
+				//stores System.in and the socket's outputStream for ease of use
 				InputStream systemIn = System.in;
 				OutputStream socketOutputStream = socket.getOutputStream();
 
+				//writes bytes from System input to the socket
 				int readByte;
 				while ((readByte = systemIn.read()) != -1) {
 					socketOutputStream.write(readByte);
 				}
 
+				//closes the socket's ouputStream without blowing everything up
 				socket.shutdownOutput();
 			} catch (IOException e) {
 				System.out.println("Error while gathering user input");
@@ -34,6 +38,7 @@ public class EchoClient {
 
 	}
 
+	//thread for processing server output
 	private static class outputThread {
 
 		Socket socket;
@@ -45,14 +50,17 @@ public class EchoClient {
 		public void run() {
 
 			try {
+				//stores System.out and the socket's inputStream for ease of use
 				OutputStream systemOut = System.out;
 				InputStream socketInputStream = socket.getInputStream();
 
+				//writes bytes from socket's inputStream to system output
 				int readByte;
 				while ((readByte = socketInputStream.read()) != -1) {
 					systemOut.write(readByte);
 				}
 
+				//not entirely clear on why this matters but it does, clears out system output
 				System.out.flush();
 
 			} catch (IOException e) {
@@ -69,6 +77,8 @@ public class EchoClient {
 	}
 
 	private void start() throws IOException {
+
+		//creates and runs the threads
 		Socket socket = new Socket("localhost", PORT_NUMBER);
 		outputThread outThread = new outputThread(socket);
 		inputThread inThread = new inputThread(socket);

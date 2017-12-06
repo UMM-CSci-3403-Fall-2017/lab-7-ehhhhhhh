@@ -25,8 +25,11 @@ public class EchoServer {
 		}
 		
 
+
 		public void run() {
 			try {
+
+				//writes input bytes directly back to output
 				InputStream inputStream = clientSocket.getInputStream();
 				OutputStream outputStream = clientSocket.getOutputStream();
 				int b;
@@ -34,6 +37,8 @@ public class EchoServer {
 					outputStream.write(b);
 				}
 	
+			//closes the socket
+			//     -Captain Obvious
 			clientSocket.close();
 			} catch (IOException e) {
 				System.out.println("IOException when running the thread");
@@ -45,6 +50,7 @@ public class EchoServer {
 	private void start() throws IOException, InterruptedException {
 		ServerSocket serverSocket = new ServerSocket(PORT_NUMBER);
 		while (true) {
+			//creates and runs the threds as requests come in
 			Socket socket = serverSocket.accept();
 			clientThread thread = new clientThread(socket);
 			thread.run();
